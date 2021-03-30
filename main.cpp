@@ -4,11 +4,11 @@
 using namespace std;
 
 const double cf = 2;
-const double x0 = 2;
-const double v0 = 2;
-
+const double x0 = 0;
+const double v0 = 700;
+/// a = 10e-5 b = 1 c = 10e5
 double U_x(double x){
-    return 2 * x * cosh(x*x);
+    return 2.39520 * x * cosh(x*x);
 }
 
 void Euler(int N, double h){
@@ -60,15 +60,27 @@ void RungeKutte(int N, double h){
     x[0] = x0;
     vector<double> tv(4), tx(4);
     for(int i = 1; i <= N; i++){
+        t[i] = i * h;
+
         tv[0] = U_x(t[i]);
-        tv[1] = U_x(t[i]);
+        tv[1] = U_x(t[i]) + tv[0] * h / 2.;
+        tv[2] = U_x(t[i]) + tv[1] * h / 2.;
+        tv[3] = U_x(t[i]) + tv[2] * h;
+        v[i] = v[i - 1] + h / 6. * (tv[0] + 2 * tv[1] + 2 * tv[2] + tv[3]);
+
+        tx[0] = v[i];
+        tx[1] = v[i] + tx[0] * h / 2.;
+        tx[2] = v[i] + tx[2] * h / 2.;
+        tx[3] = v[i] + tx[3] * h;
+        x[i] = x[i - 1] + h / 6. *(tx[0] + 2 * tx[1] + 2 * tx[2] + tx[3]);
     }
 }
 /// u'' + p(x)*u' + q(x)*y = f(x), u = u(x)
 /// a_0 * u(a) + a_1 * u'(a) = A, b_0*u(b) + b_1 * u'(b) = B
 /// a_0 = 0, a_1 = 1, b_0 = 1, b_1 = 0 p(x) = -7, q(x) = 12, f(x) = 5, A = 1, B = 2;
 /// u'' - 7 * u' + 12 * y = 5, u = u(x)
-/// u'(a) = A, u(b) = B
+/// u'(a) = 1, u(b) = 2
+
 
 void triDiag(vector <double>& a, vector <double>& b, vector <double>& c, vector <double>& d, vector <double>& y){
     int n = c.size() - 1;
@@ -86,6 +98,28 @@ void triDiag(vector <double>& a, vector <double>& b, vector <double>& c, vector 
     }
 
 }
+void mkch(int N, double h){
+    vector <double> a(N + 1), b(N + 1), c(N + 1), d(N + 1), u(n + 1);
+
+    /*..*/
+    a[0] = 0;
+    b[0] = -1;
+    c[0] = 1;
+    d[0] = h;
+    a[N] = 0;
+    b[N] = 1;
+    c[N] = 0;
+    d[N] = 2;
+
+    for(int i = 1 ; i < N; i++){
+        a[i] = 1 - (-7) * h / 2.
+        b[i] = -2 + h*h * 12;
+        c[i] = 1 + 7 * h / 2;
+        d[i] = h*h * 5;
+    }
+
+}
+
 
 
 int main()
